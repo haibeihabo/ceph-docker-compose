@@ -9,102 +9,143 @@ This docker-compose for deploy ceph version 13.2.1 & Container version v3.1.0-st
 ## Quick Start
 
 1. configuration `.env`
-``` bash
-cp env-example .env && vim .env
-```
 
-2. create bridge network
-``` bash
-docker network create --driver bridge ceph-cluster-net
-```
+    ``` bash
+    cp env-example .env && vim .env
+    ```
 
-3. up monitor and manager
-``` bash
-docker-compose up -d mon1 mgr
-```
+2. source .env
 
-4. chnage max object namespace len 
-``` bash
-vim ${VOLUMES_PATH}/ceph/ceph.conf
-```
-``` conf
-osd pool default min size = 2
-max open files = 655350
-cephx cluster require signatures = false
-cephx service require signatures = false
+    ``` bash
+    source .env
+    ```
 
-osd max object name len = 256
-osd max object namespace len = 64
-```
+3. cat ~/.docker/daemon.json
 
-5. restart monitor and manager
-``` bash
-docker-compose restart mon1 mgr
-```
+    ```json
+    {
+        "debug": true,
+        "experimental": false,
+        "default-address-pools": [
+            {
+                "base": "172.18.0.0/16",
+                "size": 24
+            }
+        ]
+    }
+    ```
 
-6. up all Object Storage Daemon
-``` bash
-docker-compose up -d osd1 osd2 osd3
-```
+4. create bridge network
 
-7. up RADOS Gateway
-``` bash
-docker-compose up -d rgw1
-```
+    ``` bash
+    docker network create --driver bridge ceph-cluster-net
+    ```
 
-8. up Metadata Server
-``` bash
-docker-compose up -d mds1
-```
+5. up monitor and manager
 
-9. enable `mgr` dashboard module
-``` bash
-docker-compose exec mon1 ceph mgr module enable dashboard
-```
+    ``` bash
+    docker-compose up -d mon1 mgr
+    ```
 
-10. create dashboard signed cert 
-``` bash
-docker-compose exec mon1 ceph dashboard create-self-signed-cert
-```
+6. chnage max object namespace len 
 
-11.  restart `mgr` dashboard module
-``` bash
-docker-compose exec mon1 ceph mgr module disable dashboard
-``` 
-``` bash
-docker-compose exec mon1 ceph mgr module enable dashboard
-```
+    ``` bash
+    vim ${VOLUMES_PATH}/ceph/ceph.conf
+    ```
 
-12. bind dashport port and domain
-``` bash
-docker-compose exec mon1 ceph config set mgr mgr/dashboard/server_addr mgr
-```
-``` bash
-docker-compose exec mon1 ceph config set mgr mgr/dashboard/server_port 8443
-```
+    ``` conf
+    osd pool default min size = 2
+    max open files = 655350
+    cephx cluster require signatures = false
+    cephx service require signatures = false
 
-13.  get all mgr register services
-``` bash
-docker-compose exec mon1 ceph mgr services
-```
+    osd max object name len = 256
+    osd max object namespace len = 64
+    ```
 
-14. create dashboard account
-``` bash
-docker-compose exec mon1 ceph dashboard set-login-credentials <ACCOUNT> <PASSWORD>
-```
+7. restart monitor and manager
 
-15. create rados gateway user
-``` bash
-docker-compose exec mon1 radosgw-admin user create --uid=<UID> --display-name=<DISPLAYNAME> --system
-```
+    ``` bash
+    docker-compose restart mon1 mgr
+    ```
 
-16.  bind rados gatway user to dashboard
-``` bash
-docker-compose exec mon1 ceph dashboard set-rgw-api-access-key <ACCESS_KEY>
-```
-``` bash
-docker-compose exec mon1 ceph dashboard  set-rgw-api-secret-key <SECRET_KEY>
-```
+8. up all Object Storage Daemon
+
+    ``` bash
+    docker-compose up -d osd1 osd2 osd3
+    ```
+
+9. up RADOS Gateway
+
+    ``` bash
+    docker-compose up -d rgw1
+    ```
+
+10. up Metadata Server
+
+    ``` bash
+    docker-compose up -d mds1
+    ```
+
+11. enable `mgr` dashboard module
+
+    ``` bash
+    docker-compose exec mon1 ceph mgr module enable dashboard
+    ```
+
+12. create dashboard signed cert
+
+    ``` bash
+    docker-compose exec mon1 ceph dashboard create-self-signed-cert
+    ```
+
+13. restart `mgr` dashboard module
+
+    ``` bash
+    docker-compose exec mon1 ceph mgr module disable dashboard
+    ```
+
+    ``` bash
+    docker-compose exec mon1 ceph mgr module enable dashboard
+    ```
+
+14. bind dashport port and domain
+
+    ``` bash
+    docker-compose exec mon1 ceph config set mgr mgr/dashboard/server_addr mgr
+    ```
+
+    ``` bash
+    docker-compose exec mon1 ceph config set mgr mgr/dashboard/server_port 8443
+    ```
+
+15. get all mgr register services
+
+    ``` bash
+    docker-compose exec mon1 ceph mgr services
+    ```
+
+16. create dashboard account
+
+    ``` bash
+    docker-compose exec mon1 ceph dashboard set-login-credentials <ACCOUNT> <PASSWORD>
+    ```
+
+17. create rados gateway user
+
+    ``` bash
+    docker-compose exec mon1 radosgw-admin user create --uid=<UID> --display-name=<DISPLAYNAME> --system
+    ```
+
+18. bind rados gatway user to dashboard
+
+    ``` bash
+    docker-compose exec mon1 ceph dashboard set-rgw-api-access-key <ACCESS_KEY>
+    ```
+
+    ``` bash
+    docker-compose exec mon1 ceph dashboard  set-rgw-api-secret-key <SECRET_KEY>
+    ```
 
 ## Install
 
