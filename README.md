@@ -298,4 +298,3 @@ docker exec -ti mon1 ceph dashboard set-rgw-api-access-key <access_key>
 ``` bash
 docker exec -ti mon1 ceph dashboard set-rgw-api-secret-key <secret_key>
 ```
-
